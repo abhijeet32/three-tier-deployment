@@ -1,18 +1,13 @@
 FROM node:22-alpine3.21 AS builder
 
-WORKDIR /usr/app
+WORKDIR /app
 COPY package*.json ./
-RUN npm install -g npm@11.8.0
+RUN npm install
 COPY . .
-RUN npm install --production
+RUN npm run build
 
-FROM node:22-alpine3.21 AS runner
+FROM nginx:alpine
 
-WORKDIR /usr/app
-COPY --from=builder /usr/app/package*.json ./
-COPY --from=builder /usr/app/public ./public
-COPY --from=builder /usr/app/node_modules ./node_modules
-COPY --from=builder /usr/app/src ./src
-
-EXPOSE 3000
-CMD [ "npm", "start"]
+COPY --from=builder /app/build /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
