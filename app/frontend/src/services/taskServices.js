@@ -1,18 +1,30 @@
 import axios from "axios";
-const apiUrl = process.env.REACT_APP_BACKEND_URL //"http://localhost:8080/api/tasks";
-console.log(apiUrl)
+
+const apiUrl =
+    process.env.REACT_APP_BACKEND_URL || "http://localhost:8080/api/tasks";
+
+function authConfig() {
+    const token = localStorage.getItem("authToken");
+    if (!token) return {};
+    return {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    };
+}
+
 export function getTasks() {
-    return axios.get(apiUrl);
+    return axios.get(apiUrl, authConfig());
 }
 
 export function addTask(task) {
-    return axios.post(apiUrl, { task: task });
+    return axios.post(apiUrl, task, authConfig());
 }
 
 export function updateTask(id, task) {
-    return axios.put(apiUrl + "/" + id, task);
+    return axios.put(`${apiUrl}/${id}`, task, authConfig());
 }
 
 export function deleteTask(id) {
-    return axios.delete(apiUrl + "/" + id);
+    return axios.delete(`${apiUrl}/${id}`, authConfig());
 }

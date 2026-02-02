@@ -16,6 +16,7 @@ import {
     updateTask,
     deleteTask,
 } from "./services/taskServices";
+import { login, signup } from "./services/authServices";
 import "./App.css";
 
 const FILTERS = {
@@ -32,7 +33,22 @@ const App = () => {
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState("");
 
+    const [authMode, setAuthMode] = useState("login"); // 'login' | 'signup'
+    const [authEmail, setAuthEmail] = useState(
+        localStorage.getItem("authEmail") || ""
+    );
+    const [authPassword, setAuthPassword] = useState("");
+    const [authLoading, setAuthLoading] = useState(false);
+    const [authError, setAuthError] = useState("");
+    const [isAuthenticated, setIsAuthenticated] = useState(
+        !!localStorage.getItem("authToken")
+    );
+
     useEffect(() => {
+        if (!isAuthenticated) {
+            return;
+        }
+
         const loadTasks = async () => {
             setLoading(true);
             setError("");
@@ -48,7 +64,50 @@ const App = () => {
         };
 
         loadTasks();
-    }, []);
+    }, [isAuthenticated]);
+
+    const handleAuthSubmit = async (event) => {
+        event.preventDefault();
+        if (!authEmail || !authPassword) {
+            setAuthError("Email and password are required.");
+            return;
+        }
+
+        setAuthLoading(true);
+        setAuthError("");
+        try {
+            const action = authMode === "signup" ? signup : login;
+            const { data } = await action({
+                email: authEmail,
+                password: authPassword,
+            });
+
+            if (data?.token) {
+                localStorage.setItem("authToken", data.token);
+                localStorage.setItem("authEmail", data.user?.email || authEmail);
+                setIsAuthenticated(true);
+                setAuthPassword("");
+            } else {
+                setAuthError("Unexpected response from server.");
+            }
+        } catch (err) {
+            console.error(err);
+            const message =
+                err?.response?.data?.message ||
+                "Unable to authenticate. Please try again.";
+            setAuthError(message);
+        } finally {
+            setAuthLoading(false);
+        }
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("authEmail");
+        setIsAuthenticated(false);
+        setTasks([]);
+        setError("");
+    };
 
     const handleChange = (event) => {
         setCurrentTask(event.target.value);
@@ -136,6 +195,94 @@ const App = () => {
 
             <main className="main-content">
                 <Paper elevation={6} className="todo-container">
+                    {!isAuthenticated ? (
+                        <>
+                            <div className="auth-toggle">
+                                <Button
+                                    size="small"
+                                    color={authMode === "login" ? "primary" : "default"}
+                                    variant={authMode === "login" ? "contained" : "text"}
+                                    onClick={() => setAuthMode("login")}
+                                >
+                                    Log in
+                                </Button>
+                                <Button
+                                    size="small"
+                                    color={authMode === "signup" ? "primary" : "default"}
+                                    variant={authMode === "signup" ? "contained" : "text"}
+                                    onClick={() => setAuthMode("signup")}
+                                >
+                                    Sign up
+                                </Button>
+                            </div>
+
+                            <form onSubmit={handleAuthSubmit} className="auth-form">
+                                <TextField
+                                    label="Email"
+                                    type="email"
+                                    variant="outlined"
+                                    size="small"
+                                    value={authEmail}
+                                    onChange={(e) => setAuthEmail(e.target.value)}
+                                    fullWidth
+                                    required
+                                />
+                                <TextField
+                                    label="Password"
+                                    type="password"
+                                    variant="outlined"
+                                    size="small"
+                                    value={authPassword}
+                                    onChange={(e) => setAuthPassword(e.target.value)}
+                                    fullWidth
+                                    required
+                                />
+                                <Button
+                                    type="submit"
+                                    color="primary"
+                                    variant="contained"
+                                    disabled={authLoading}
+                                >
+                                    {authLoading
+                                        ? authMode === "signup"
+                                            ? "Signing up…"
+                                            : "Logging in…"
+                                        : authMode === "signup"
+                                        ? "Sign up"
+                                        : "Log in"}
+                                </Button>
+                            </form>
+
+                            {authError && (
+                                <Typography
+                                    variant="body2"
+                                    color="error"
+                                    className="error-message"
+                                >
+                                    {authError}
+                                </Typography>
+                            )}
+
+                            <Divider className="divider" />
+
+                            <Typography variant="body2" className="placeholder">
+                                Log in or sign up to manage your to‑dos.
+                            </Typography>
+                        </>
+                    ) : (
+                        <>
+                            <div className="auth-summary">
+                                <Typography variant="body2">
+                                    Logged in as <strong>{authEmail}</strong>
+                                </Typography>
+                                <Button
+                                    size="small"
+                                    color="default"
+                                    onClick={handleLogout}
+                                >
+                                    Log out
+                                </Button>
+                            </div>
                     <form onSubmit={handleSubmit} className="task-form">
                         <TextField
                             variant="outlined"
@@ -235,6 +382,8 @@ const App = () => {
                         >
                             {error}
                         </Typography>
+                    )}
+                        </>
                     )}
                 </Paper>
             </main>
