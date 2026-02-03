@@ -91,10 +91,18 @@ const App = () => {
                 setAuthError("Unexpected response from server.");
             }
         } catch (err) {
-            console.error(err);
-            const message =
-                err?.response?.data?.message ||
-                "Unable to authenticate. Please try again.";
+            console.error("Auth error:", err);
+            console.error("Error response:", err?.response);
+            console.error("Error message:", err?.message);
+            
+            let message = "Unable to authenticate. Please try again.";
+            if (err?.response?.data?.message) {
+                message = err.response.data.message;
+            } else if (err?.message) {
+                message = `Network error: ${err.message}`;
+            } else if (err?.code === "ECONNREFUSED" || err?.code === "ERR_NETWORK") {
+                message = "Cannot connect to server. Please check if backend is running.";
+            }
             setAuthError(message);
         } finally {
             setAuthLoading(false);

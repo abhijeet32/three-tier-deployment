@@ -10,6 +10,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "dev_jwt_secret_change_me";
 // POST /api/auth/signup
 router.post("/signup", async (req, res) => {
     try {
+        console.log("Signup request received:", { email: req.body?.email, hasPassword: !!req.body?.password });
         const { email, password } = req.body;
 
         if (!email || !password) {
@@ -48,6 +49,7 @@ router.post("/signup", async (req, res) => {
 // POST /api/auth/login
 router.post("/login", async (req, res) => {
     try {
+        console.log("Login request received:", { email: req.body?.email, hasPassword: !!req.body?.password });
         const { email, password } = req.body;
 
         if (!email || !password) {

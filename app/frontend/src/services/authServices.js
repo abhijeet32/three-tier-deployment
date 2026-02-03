@@ -1,16 +1,22 @@
 import axios from "axios";
 
 const authUrl =
-    process.env.REACT_APP_AUTH_URL || "http://localhost:8080/api/auth";
+    process.env.REACT_APP_AUTH_URL || "http://192.168.49.2:30080/api/auth";
+
+console.log("Auth URL configured:", authUrl);
 
 export function signup(credentials) {
     // credentials: { email, password }
-    return axios.post(`${authUrl}/signup`, credentials);
+    const url = `${authUrl}/signup`;
+    console.log("Signup request to:", url, "with:", { email: credentials.email });
+    return axios.post(url, credentials);
 }
 
 export function login(credentials) {
     // credentials: { email, password }
-    return axios.post(`${authUrl}/login`, credentials);
+    const url = `${authUrl}/login`;
+    console.log("Login request to:", url, "with:", { email: credentials.email });
+    return axios.post(url, credentials);
 }
 
 

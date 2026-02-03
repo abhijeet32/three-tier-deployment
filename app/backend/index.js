@@ -9,7 +9,14 @@ const app = express();
 connection();
 
 app.use(express.json());
-app.use(cors());
+
+// CORS configuration - allow all origins for development/Kubernetes
+app.use(cors({
+    origin: true, // Allow all origins
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 app.get("/ok", (req, res) => {
     res.status(200).send("ok");

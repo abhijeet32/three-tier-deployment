@@ -25,10 +25,12 @@ spec:
     spec:
       containers:
       - name: todo-frontend-container
-        image: abhi0874/todo-frontend:latest
+        image: abhi0874/todo-frontend:v4
         imagePullPolicy: Always
         env:
           - name: REACT_APP_BACKEND_URL
             value: "http://192.168.49.2:30080/api/tasks"
+          - name: REACT_APP_AUTH_URL
+            value: "http://192.168.49.2:30080/api/auth"
         ports:
         - containerPort: 80
