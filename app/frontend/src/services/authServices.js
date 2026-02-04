@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const authUrl =
-    process.env.REACT_APP_AUTH_URL || "http://192.168.49.2:30080/api/auth";
+    process.env.REACT_APP_AUTH_URL || "http://localhost:8080/api/auth";
 
 console.log("Auth URL configured:", authUrl);
 
