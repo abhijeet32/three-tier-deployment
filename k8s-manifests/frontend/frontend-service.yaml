@@ -1,14 +1,14 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: frontend-service
+  name: frontend-svc
 
 spec:
-  type: NodePort
+  type: ClusterIP # $change to nodeport if not using ingress
   selector:
     app: frontend
   ports:
   - port: 80
     targetPort: 80
-    nodePort: 30081
+    # nodePort: 30081
     protocol: TCP

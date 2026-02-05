@@ -4,10 +4,10 @@ metadata:
   name: backend-svc
 
 spec:
-  type: NodePort
+  type: ClusterIP    # change to nodeport if not using ingress
   selector:
     app: backend
   ports:
   - port: 8080
     targetPort: 8080
-    nodePort: 30080
+    # nodePort: 30080

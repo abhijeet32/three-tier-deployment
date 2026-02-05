@@ -1,7 +1,8 @@
 import axios from "axios";
 
 const apiUrl =
-    process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:57847/api/tasks";
+    "/api/tasks";
+    // process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:57847/api/tasks";
 
 function authConfig() {
     const token = localStorage.getItem("authToken");
