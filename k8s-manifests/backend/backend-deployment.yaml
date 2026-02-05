@@ -25,7 +25,7 @@ spec:
     spec:
       containers:
       - name: backend-container
-        image: abhi0874/todo-backend:v3
+        image: abhi0874/todo-backend:v4
         imagePullPolicy: Always
         env:
           - name: MONGO_CONN_STR
